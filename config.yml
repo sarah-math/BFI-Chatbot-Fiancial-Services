@@ -1,0 +1,75 @@
+
+language: en
+pipeline:
+
+   - name: SpacyNLP
+     model: "en_core_web_md"
+     case_sensitive: false
+   - name: SpacyTokenizer
+   - name: SpacyEntityExtractor
+     dimensions: ["PERSON"]
+   - name: LexicalSyntacticFeaturizer
+   - name: SpacyFeaturizer
+   - name: CountVectorsFeaturizer
+   - name: CountVectorsFeaturizer
+     analyzer: char_wb
+     min_ngram: 1
+     max_ngram: 4
+
+
+   - name: DucklingEntityExtractor
+     url: http://localhost:8000
+     dimensions:
+      - amount-of-money
+      - time
+      - number
+    
+   - name: DIETClassifier
+     epochs: 100
+     constrain_similarities: true
+    # hidden_layers_sizes: 
+     embedding_dimension: 20 
+     number_of_transformer_layers: 2
+     transformer_size: 256
+     weight_sparsity: 0.8
+     random_seed: 0
+
+  
+
+
+   - name: EntitySynonymMapper
+   - name: FallbackClassifier
+     threshold: 0.3
+     ambiguity_threshold: 0.1
+
+
+
+
+policies:
+
+  - name: AugmentedMemoizationPolicy
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+    constrain_similarities: true
+
+    number_of_transformer_layers:
+      text: 2
+      action_text: 2
+      label_action_text: 2
+      dialogue: 2
+    transformer_size:
+      text: 256
+      action_text: 256
+      label_action_text: 256
+      dialogue: 256
+    connection_density: 0.2
+    unidirectional_encoder: true
+    loss_type: "cross_entropy" 
+    use_sparse_input_dropout: true
+    use_dense_input_dropout: true
+ 
+ 
+
+
+  - name: RulePolicy

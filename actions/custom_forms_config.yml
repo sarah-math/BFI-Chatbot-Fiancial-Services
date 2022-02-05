@@ -1,0 +1,4 @@
+custom_forms:
+
+    max_validation_failures: 2
+    
